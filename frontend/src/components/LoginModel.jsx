@@ -1,8 +1,26 @@
 import React from "react";
 import { AnimatePresence, motion } from "motion/react";
-
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase";
+import axios from 'axios'
+import { serverUrl } from "../App";
 
 const LoginModel = ({ open, onClose }) => {
+
+ const handleGooglAuth = async () => {
+   try {
+    const result = await signInWithPopup(auth,provider)
+    const {data} = await axios.post(`${serverUrl}/api/auth/google`,{
+      name:result.user.displayName,
+      email:result.user.email,
+      avatar:result.user.photoURL,
+    },{withCredentials:true})
+    console.log(data)
+   } catch (error) {
+    console.log(error)
+   }
+ }
+
   return (
     <AnimatePresence>
       {open && (
@@ -50,7 +68,7 @@ const LoginModel = ({ open, onClose }) => {
                   <span className="bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">OmanWEB.AI</span>
                 </h2>
 
-                <motion.button
+                <motion.button onClick={handleGooglAuth}
                 whileHover={{scale: 1.04}}
                 whileTap={{scale: 0.96}}
                 className="group relative w-full h-13 rounded-xl bg-white text-black font-semibold shadow-xl overflow-hidden "
