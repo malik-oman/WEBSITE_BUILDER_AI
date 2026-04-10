@@ -1,15 +1,31 @@
 import React, { use, useState } from "react";
 import { motion,AnimatePresence } from "motion/react";
 import LoginModel from "../components/LoginModel";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {Coins} from 'lucide-react'
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setUserData } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
 
+  const navigate = useNavigate()
   const [openLogin, setOpenLogin] = useState(false)
 
   const {userData} = useSelector(state=>state.user) 
 
   const [openProfile, setOpenProfile] = useState(false)
+  const dispatch = useDispatch()
+
+  const handleLogOut = async () => {
+    try {
+      await axios.get(`${serverUrl}/api/auth/logout`,{withCredentials:true})
+      dispatch(setUserData(null))
+      setOpenProfile(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
  const highlights = [
@@ -73,8 +89,8 @@ const Home = () => {
               <span className="font-semibold">+</span>
                     </button>
 
-                    <button className="w-full px-4 py-3 text-left text-sm hover:bg-white/5 ">Dashboard</button>
-                    <button className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-white/5">Logout</button>
+                    <button onClick={()=>navigate("/dashboard")}  className="w-full px-4 py-3 text-left text-sm hover:bg-white/5 ">Dashboard</button>
+                    <button onClick={handleLogOut} className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-white/5">Logout</button>
                       
                   </motion.div>
                   </>
@@ -116,7 +132,7 @@ const Home = () => {
           responsive, production-ready websites.
         </motion.p>
         
-        <button onClick={()=>setOpenLogin(true)} className=" px-10 py-4 rounded-xl bg-white text-black font-semibold hover:scale-105 transition mt-12 cursor-pointer">Get Started</button>
+        <button onClick={()=>navigate("/dashboard")} className=" px-10 py-4 rounded-xl bg-white text-black font-semibold hover:scale-105 transition mt-12 cursor-pointer">{userData?"Go To Dashboard" : "Get Started"}</button>
       </section>
 
       <section className="max-w-7xl mx-auto px-6 pb-32">
